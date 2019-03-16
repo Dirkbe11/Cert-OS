@@ -1,0 +1,15 @@
+#ifndef __KERN_BB__
+#define __KERN_BB__
+
+#define MAX_BUFFER 10
+
+#include <lib/spinlock.h>
+
+void bb_init(void);
+int get_bb_front(void);
+int get_bb_empty(void);
+int bb_size(void);
+int bb_get(void);
+void bb_put(int);
+
+#endif

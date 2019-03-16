@@ -1,0 +1,51 @@
+#include <lib/x86.h>
+#include "ConVar.h"
+#include <lib/debug.h>
+#include <dev/intr.h>
+#include <pcpu/PCPUIntro/export.h>
+#include <thread/PCurID/export.h>
+#include <lib/spinlock.h>
+#include <thread/PTQueueInit/export.h>
+#include <thread/PThread/export.h>
+
+static spinlock_t lock2;
+
+void cv_init(CVT * con_var)
+{
+	con_var->first = 0;
+	con_var->last = 0;
+	spinlock_init(&lock2);
+}
+
+void wait(CVT* con_var, spinlock_t* lock)
+{
+	//move on to wait queue
+
+	con_var->WaitQueue[con_var->last].cpu = get_pcpu_idx();
+	con_var->WaitQueue[con_var->last].pid = get_curid();	
+	con_var->last = (con_var->last + 1) % 100; //size of waitq
+
+	intr_local_disable();
+	spinlock_release(lock);
+	thread_yield();
+	intr_local_enable();
+
+	spinlock_acquire(lock);
+}
+
+void signal(CVT* con_var, spinlock_t* lock)
+{
+	if (con_var->first == con_var->last)
+	{
+		return;
+	}
+	else
+	{
+		intr_local_disable();
+		unsigned int cpu = con_var->WaitQueue[con_var->first].cpu;
+		unsigned int pid = con_var->WaitQueue[con_var->first].pid;
+		tqueue_enqueue(cpu + NUM_IDS, pid);
+		intr_local_enable();
+	}
+}
+

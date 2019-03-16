@@ -1,0 +1,29 @@
+#ifndef __CON_VAR__
+#define __CON_VAR__
+
+#include <lib/spinlock.h>
+#include <lib/debug.h>
+
+
+typedef struct Wait {
+
+	unsigned int pid;
+	unsigned int cpu;
+} WQ;
+
+typedef struct CONVAR {
+
+	WQ WaitQueue[100];
+	int first;
+	int last;
+
+
+} CVT;
+
+void wq_init(WQ *);
+
+void cv_init(CVT *);
+void wait(CVT *, spinlock_t*);
+void signal(CVT *, spinlock_t*);
+
+#endif

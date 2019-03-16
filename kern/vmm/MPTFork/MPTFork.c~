@@ -1,0 +1,54 @@
+#include <lib/x86.h>
+
+#include "import.h"
+
+
+unsigned int COW(unsigned int pid, unsigned int vaddr)
+{
+
+	return 0;
+}
+
+
+unsigned int page_alloc(unsigned int child)
+{
+	unsigned int new_alloc = alloc_ptbl(child, child << 22);
+	return new_alloc;
+}
+
+unsigned int copy_pdir(unsigned int pid, unsigned int child)
+{
+
+	unsigned int page_index;
+	unsigned int old_ptr;
+	unsigned int new_entry;
+	unsigned int new_page;
+
+	for (int i = 0; i < 1024; ++i)
+	{
+		if (i < 256 || i >= 960)
+			continue;
+
+		new_page = page_alloc(child);
+		
+		old_ptr = get_pdir_entry(pid, i);
+		set_pdir_entry(child, new_page, old_ptr);
+	}
+
+	return 0;
+
+
+}
+
+unsigned int proc_fork(unsigned int pid)
+{
+	unsigned int quota;
+	unsigned int child;
+	quota = container_get_quota(pid)/2;
+
+	child = container_split(pid, quota);
+
+	copy_pdir(pid, child);
+
+        return 0;
+}

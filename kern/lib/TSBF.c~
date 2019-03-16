@@ -1,0 +1,90 @@
+#include <lib/x86.h>
+#include <lib/spinlock.h>
+#include <lib/debug.h>
+#include "TSBF.h"
+#include <pcpu/PCPUIntro/export.h>
+#include <lib/ConVar.h>
+
+struct BB {
+
+	//Synchronization variables
+	spinlock_t BB_lk;
+
+	//buffer
+	int buffer[MAX_BUFFER];
+	int front;
+	int nextEmpty;
+
+	//condition variables
+	CVT consume;
+	CVT produce;
+
+};
+
+struct BB BoundedBuffer;
+
+void bb_init(void)
+{
+	BoundedBuffer.front = 0;
+	BoundedBuffer.nextEmpty = 0;
+	cv_init(&(BoundedBuffer.consume));
+	cv_init(&(BoundedBuffer.produce));
+	spinlock_init(&(BoundedBuffer.BB_lk));
+}
+
+int get_bb_front(void)
+{
+	return(BoundedBuffer.front);
+}
+
+int get_bb_empty(void)
+{
+	return(BoundedBuffer.nextEmpty);
+}
+
+int bb_size(void)
+{
+	return(BoundedBuffer.nextEmpty - BoundedBuffer.front);
+}
+
+int bb_get(void)
+{
+	spinlock_acquire(&(BoundedBuffer.BB_lk));
+	int item;
+
+	while (BoundedBuffer.front == BoundedBuffer.nextEmpty)
+	{
+	  //KERN_DEBUG("CPU %d: Process %d: BUFFER EMPTY!!\n", get_pcpu_idx(), get_curid());
+		wait(&(BoundedBuffer.consume), &(BoundedBuffer.BB_lk));
+	}
+
+		item = BoundedBuffer.buffer[(BoundedBuffer.front % MAX_BUFFER)];
+		BoundedBuffer.front++;
+
+	signal(&(BoundedBuffer.produce), &(BoundedBuffer.BB_lk));
+	spinlock_release(&(BoundedBuffer.BB_lk));
+
+	return item;
+}
+
+void bb_put(int obj)
+{
+	spinlock_acquire(&(BoundedBuffer.BB_lk));
+
+	while(bb_size() == MAX_BUFFER)
+	{
+	  //KERN_DEBUG("CPU %d: Process %d: BUFFER FULL!!\n", get_pcpu_idx(), get_curid());
+		wait(&(BoundedBuffer.produce), &(BoundedBuffer.BB_lk));
+	}
+
+	BoundedBuffer.buffer[(BoundedBuffer.nextEmpty % MAX_BUFFER)] = obj;
+	BoundedBuffer.nextEmpty++;
+
+	signal(&(BoundedBuffer.consume), &(BoundedBuffer.BB_lk));
+	spinlock_release(&(BoundedBuffer.BB_lk));
+
+}
+
+
+
+
