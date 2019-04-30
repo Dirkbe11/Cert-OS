@@ -1,9 +1,9 @@
-Certified Operating System
+**Certified Operating System**
 Cert is a small operating system built using C and run using the qemu emulator. 
 
-Details:
+**Details:**
 The operating system was build by adding to an extensive already existing codebase. 
-
+'''
 The features added include:
 •	Physical Memory Manager
 •	Virtual Memory Manager
@@ -14,3 +14,4 @@ The features added include:
 •	Preemptive Multitasking
 •	Thread Scheduler : sleep on resource wait
 •	User Shell 
+'''
