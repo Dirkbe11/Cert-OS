@@ -1,4 +1,6 @@
 **Certified Operating System**
+CURRENTLY UNDER CONSTRUCTION. 
+
 Cert is a small operating system built using C and run using the qemu emulator. 
 
 **Details:**
