@@ -17,3 +17,12 @@ The features added include:
 •	Thread Scheduler : sleep on resource wait
 •	User Shell 
 ```
+
+REQUIREMENTS:
+-qemu
+-gcc 32-bit multilib
+
+RUNNING:
+-In the home directory, run make
+-run make qemu
+
