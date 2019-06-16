@@ -1,5 +1,6 @@
 **Certified Operating System**
-CURRENTLY UNDER CONSTRUCTION. 
+CURRENTLY UNDER CONSTRUCTION.
+You may have issues if running the operating system using ubuntu on a virtual machine.
 
 Cert is a small operating system built using C and run using the qemu emulator. 
 
@@ -19,10 +20,11 @@ The features added include:
 ```
 
 REQUIREMENTS:
--qemu
+-qemu\n
 -gcc 32-bit multilib
 
 RUNNING:
--In the home directory, run make
--run make qemu
+-In the home directory,\n
+1.) run make
+2.) run make qemu
 
