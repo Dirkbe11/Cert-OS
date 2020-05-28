@@ -4,8 +4,6 @@ You may have issues if running the operating system using ubuntu on a virtual ma
 
 Cert is a small operating system built using C and run using the qemu emulator. 
 
-**Details:**
-The operating system was build by adding to an extensive already existing codebase. 
 ```
 The features added include:
 •	Physical Memory Manager
